@@ -37,7 +37,7 @@ pipeline{
             steps{
                 sh '''
                     #mvn clean install
-                    /usr/share/maven/bin/mvn package
+                    /home/jenkins/apache-maven-3.6.3/bin/mvn package
                 '''
             }
         }
