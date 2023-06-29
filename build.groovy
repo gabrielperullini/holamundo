@@ -37,7 +37,7 @@ pipeline{
             steps{
                 sh '''
                     #mvn clean install
-                    /home/jenkins/workspace/Build Hola Mundo/apache-maven-3.6.3/bin/mvn package
+                    /home/jenkins/workspace/Build Hola Mundo@tmp/apache-maven-3.6.3/bin/mvn package
                 '''
             }
         }
