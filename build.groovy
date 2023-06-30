@@ -42,6 +42,7 @@ pipeline{
             }
         }
         stage('Upload to nexus'){
+            echo "Artifact Path: ${artifactPath}
             agent {
                 label 'master'
             }
