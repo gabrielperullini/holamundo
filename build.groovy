@@ -41,8 +41,7 @@ pipeline{
                 '''
             }
         }
-        stage('Upload to nexus'){
-            echo "Artifact Path: ${artifactPath}
+        stage('Upload to nexus'){            
             agent {
                 label 'master'
             }
@@ -57,6 +56,7 @@ pipeline{
                     artifactExists = fileExists artifactPath
 
                     if(artifactExists) {
+                        echo "Artifact Path: ${artifactPath}
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
 
                         nexusArtifactUploader(
