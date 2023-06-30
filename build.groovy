@@ -37,7 +37,7 @@ pipeline{
             steps{
                 sh '''
                     #mvn clean install
-                    /usr/bin/mvn/mvn package
+                    /usr/bin/mvn package
                 '''
             }
         }
