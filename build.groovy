@@ -20,26 +20,27 @@ pipeline{
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus_jenkins"
         
-        // Workfolder
+          // Workfolder
         //WORKFOLDER = "/usr/jenkins/node_agent/workspace"
     }
 
     stages{
         stage('Checkout'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_gabrielperullini', url: 'git@github.com:gabrielperullini/holamundo.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_jtassi', url: 'git@github.com:calamza/holamundo.git']]])
             }
         }
         stage('Build artifact'){
             agent {
                 label 'master'
-            }            
+            }
             steps{
                 sh '''
                     #mvn clean install
-                    /usr/bin/mvn package
+                    /home/jenkins/apache-maven-3.6.3/bin/mvn package
                 '''
             }
+        }
         stage('Upload to nexus'){
             agent {
                 label 'master'
