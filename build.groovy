@@ -18,7 +18,7 @@ pipeline{
         // Repository where we will upload the artifact
         NEXUS_REPOSITORY = "maven-releases"
         // Jenkins credential id to authenticate to Nexus OSS
-        NEXUS_CREDENTIAL_ID = "jenkins"
+        NEXUS_CREDENTIAL_ID = "nexus_jenkins"
 
           // Workfolder
         //WORKFOLDER = "/usr/jenkins/node_agent/workspace"
