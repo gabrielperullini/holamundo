@@ -1,6 +1,6 @@
-pipeline {
+pipeline{
     agent {
-        label 'master'
+         label 'master'
     }
     /*
     tools {
@@ -19,44 +19,43 @@ pipeline {
         NEXUS_REPOSITORY = "maven-releases"
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus_jenkins"
-
+        
         // Workfolder
         //WORKFOLDER = "/usr/jenkins/node_agent/workspace"
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_gabrielperullini', url: 'git@github.com:gabrielperullini/holamundo.git']]])
+    stages{
+        stage('Checkout'){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_jtassi', url: 'git@github.com:calamza/holamundo.git']]])
             }
         }
-        stage('Build artifact') {
+        stage('Build artifact'){
             agent {
                 label 'master'
             }
-            steps {
+            steps{
                 sh '''
                     #mvn clean install
                     /usr/bin/mvn package
                 '''
             }
         }
-        stage('Upload to Nexus') {
+        stage('Upload to nexus'){
             agent {
                 label 'master'
             }
-            steps {
-                script {
-                    def pom = readMavenPom file: 'pom.xml'
-                    def packaging = pom.packaging
-                    def artifactPath = "target/${pom.artifactId}.${packaging}"
-                    def artifactExists = fileExists artifactPath
+            steps{
+                script{
+                    pom = readMavenPom(file: 'pom.xml')
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    artifactPath = filesByGlob[0].path
+                    artifactExists = fileExists artifactPath
 
-                    echo "Artifact Path: ${artifactPath}"
-
-                    if (artifactExists) {
-                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${packaging}, version ${pom.version}"
-
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        
                         nexusArtifactUploader(
                             nexusVersion: NEXUS_VERSION,
                             protocol: NEXUS_PROTOCOL,
@@ -67,29 +66,29 @@ pipeline {
                             credentialsId: NEXUS_CREDENTIAL_ID,
                             artifacts: [
                                 // Artifact generated such as .jar, .ear and .war files.
-                                [
-                                    artifactId: pom.artifactId,
-                                    classifier: '',
-                                    file: artifactPath,
-                                    type: packaging
-                                ],
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging],
+
                                 // Lets upload the pom.xml file for additional information for Transitive dependencies
-                                [
-                                    artifactId: pom.artifactId,
-                                    classifier: '',
-                                    file: 'pom.xml',
-                                    type: 'pom'
-                                ]
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: "pom.xml",
+                                type: "pom"]
                             ]
-                        )
+                        );
+
                     } else {
-                        error "*** File: ${artifactPath}, could not be found"
+                        error "*** File: ${artifactPath}, could not be found";
                     }
                 }
+
             }
         } //fin stage upload
-
-        stage('Post') {
+        
+        
+        stage("Post") {
             agent {
                 label 'maven'
             }
@@ -101,5 +100,6 @@ pipeline {
                 '''
             }
         } //fin stage post
+        
     }
 }
