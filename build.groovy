@@ -54,9 +54,9 @@ pipeline{
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
                     artifactPath = filesByGlob[0].path
                     artifactExists = fileExists artifactPath
-
+                    echo "Artifact Path: ${artifactPath}"
                     if(artifactExists) {
-                        echo "Artifact Path: ${artifactPath}"
+                        
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
 
                         nexusArtifactUploader(
