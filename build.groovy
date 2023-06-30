@@ -14,20 +14,20 @@ pipeline{
         // This can be http or https
         NEXUS_PROTOCOL = "http"
         // Where your Nexus is running. 'nexus-3' is defined in the docker-compose file
-        NEXUS_URL = "192.168.42.130:8081"
+        NEXUS_URL = "192.168.1.41:8081"
         // Repository where we will upload the artifact
         NEXUS_REPOSITORY = "maven-releases"
         // Jenkins credential id to authenticate to Nexus OSS
-        NEXUS_CREDENTIAL_ID = "nexus_jenkins"
-        
-        // Workfolder
+        NEXUS_CREDENTIAL_ID = "jenkins"
+
+          // Workfolder
         //WORKFOLDER = "/usr/jenkins/node_agent/workspace"
     }
 
     stages{
         stage('Checkout'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_jtassi', url: 'git@github.com:calamza/holamundo.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github_gabrielperullini', url: 'git@github.com:gabrielperullini/holamundo.git']]])
             }
         }
         stage('Build artifact'){
@@ -37,7 +37,7 @@ pipeline{
             steps{
                 sh '''
                     #mvn clean install
-                    /home/jenkins/apache-maven-3.6.3/bin/mvn package
+                    /usr/bin/mvn package
                 '''
             }
         }
@@ -48,6 +48,8 @@ pipeline{
             steps{
                 script{
                     pom = readMavenPom(file: 'pom.xml')
+                    echo "Number of files found: ${filesByGlob.size()}"
+                    echo "Workspace directory: ${env.WORKSPACE}"                   
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}")
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
                     artifactPath = filesByGlob[0].path
@@ -55,7 +57,7 @@ pipeline{
 
                     if(artifactExists) {
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
-                        
+
                         nexusArtifactUploader(
                             nexusVersion: NEXUS_VERSION,
                             protocol: NEXUS_PROTOCOL,
@@ -86,8 +88,8 @@ pipeline{
 
             }
         } //fin stage upload
-        
-        
+
+
         stage("Post") {
             agent {
                 label 'maven'
@@ -100,6 +102,6 @@ pipeline{
                 '''
             }
         } //fin stage post
-        
+
     }
 }
