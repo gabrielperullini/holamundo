@@ -34,12 +34,17 @@ pipeline{
             agent {
                 label 'master'
             }
+            /*
             steps{
                 sh '''
                     #mvn clean install
                     /usr/bin/mvn package
                 '''
             }
+            */
+            steps {
+                sh 'mvn package'
+                  }
         }
         stage('Upload to nexus'){
             agent {
